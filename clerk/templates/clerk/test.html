@@ -1,0 +1,79 @@
+<form action = "sell/calc_bill" method = "post">
+    <div class="cc-info">
+        <div class="customer-info">
+            <label>Customer Info</label>
+            <input id="bill-phone" type="tel" name = "CPhoneNo" pattern="0[3,5,7,8,9][0-9]{8}" required placeholder="(Customer phone number)">
+        </div>
+    </div>
+
+    <div class="bill-info">
+        <h4>Bill Info</h4>
+        
+        <div class="product-attribute-name">
+            <div class="product-info">
+                PBarcode
+            </div>
+            <div class="product-info">
+                Quantity
+            </div>
+            <div class="product-info">
+                PName
+            </div>
+            <div class="product-info">
+                Price
+            </div>
+            <div class="product-info">
+                Final Price
+            </div>
+        </div>
+        
+        <div class="total-product">
+
+            <div class="product-attribute">
+                <div class="product-info">
+                    <input id="pbarcode" name = "PBarcode" type="text">
+                </div>
+                <div class="product-info">
+                    <input id="quantity" name = "SBQty"type="number" min = "1" onkeyup="calculateprice(document.getElementById('price').value, this.value)">
+                </div>
+                <div class="product-info">
+                    <p id="pname" type="text"></p>
+                </div>
+                <div class="product-info">
+                    <p id="price" type="number" min="0" required onkeyup="calculateprice(this.value, document.getElementById('quantity').value)"></p>
+                </div>
+                <div class="product-info">
+                    <p id="finalprice">34</p>
+                </div>
+            </div>
+
+
+            <!-- beforeend -->
+        </div>
+
+    </div>
+    
+    <div class="calc-price">
+        <div>
+            <label for="Total price">Total Price:</label>
+            <p id="total-price">0</p> 
+            <p> VND</p>
+        </div>
+        <div>
+            <label for="Discount Rate">Discount Rate:</label>
+            <input type="number" min="0" max="100" required placeholder="Input discount rate here">
+        </div>
+        <div>
+            <label for="Final Price">Final Price:</label>
+            <p>0</p>
+            <p> VND</p>
+        </div>
+    </div>
+
+    <div class="button">
+        <button class="btn" id="add-product">Add more</button>
+        <button class="btn" id="billOK">OK</button>
+        <button class="btn" id="cancel-selling-bill">Cancel</button>
+        <input class="btn" id="calculate-price-all" type = "submit" value = "Calculate">
+    </div>
+</form>

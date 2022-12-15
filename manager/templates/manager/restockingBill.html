@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="manager.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@2.43.2/dist/full.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Manager Info</title>
+  </head>
+  
+  {% for rb in lst_restocking_bill %}
+  <input type="checkbox" id="my-modal-6{{forloop.counter}}" class="modal-toggle" />
+  <div class="modal w-full">
+    <div class="modal-box w-9/12 max-w-none max-h-none">
+      <h3 class="font-bold text-lg">Bill number: {{ rb.RBNo }}</h3>
+      <div class="overflow-x-auto">
+        <table class="table table-compact w-full">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Product Barcode</th>
+              <th>Product Name</th>
+              <th>Product Quantity</th>
+              <th>Product Price</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for product in rb.products.all %}
+            <tr>
+              <th>{{product.PBarcode}}</th>
+              <th>{{product.PName}}</th>
+
+              <!-- {% for detail in lst_selling_bill_detail %}
+              {% if product.PBarcode == detail.PBarcode.PBarcode and sb.SBNo == detail.SBNo.SBNo %}
+                <th>{{detail.SBQty}}</th>
+                <th>{%widthratio detail.SBQty 1 product.PPrice%</th>
+              {% endif %}
+              {% endfor %} -->
+              
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th></th>
+              <th>Product Barcode</th>
+              <th>Product Name</th>
+              <th>Product Quantity</th>
+              <th>Product Price</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="modal-action">
+        <label for="my-modal-6{{forloop.counter}}" class="btn">Close</label>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <body>
+    <div class="navbar bg-base-100">
+      <div class="navbar-start">
+        <div class="dropdown">
+          <label tabindex="0" class="btn btn-ghost btn-circle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+          </label>
+          <ul
+            tabindex="0"
+            class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            <li tabindex="0">
+              <span class="active">Info</span>
+              <ul class="bg-base-100">
+                <li><a href="clerk">Clerk</a></li>
+                <li><a href="customer">Customer</a></li>
+                <li><a href="product">Product</a></li>
+                <li><a href="wholesale_company">Wholesale</a></li>
+                <li><a href="discount_service">Discount Service</a></li>
+                <li><a href="accumulating_service">Accumulating Service</a></li>
+                <li><a href="restocking_bill" class = "active">Restocking Bill</a></li>
+                <li><a href="selling_bill">Selling Bill</a></li>
+              </ul>
+            </li>
+            <li><a>Restock</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="navbar-center">
+        <a class="btn btn-ghost normal-case text-xl">Manager</a>
+      </div>
+      <div class="navbar-end">
+        <div class="form-control">
+          <input
+            type="text"
+            placeholder="Search"
+            class="input input-bordered input-primary w-full max-w-xs"
+          />
+        </div>
+        <button class="btn btn-ghost btn-circle">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </button>
+        <button class="btn btn-ghost btn-circle">
+          <div class="indicator">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              />
+            </svg>
+            <span class="badge badge-xs badge-primary indicator-item"></span>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="content-body">
+      <div class="prose max-w-full px-10">
+        <div class="grid grid-cols-2">
+          <h1 class="text-3xl font-bold underline text-left mb-2">
+            Restocking Bill
+          </h1>
+          
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table table-compact w-full">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Restocking bill number</th>
+                <th>Manager number</th>
+                <th>Wholesale Company Name</th>
+                <th>Date</th>
+                <th>Total Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for rs in lst_restocking_bill %}
+              <tr>
+                <th>
+                  <label for="my-modal-6{{forloop.counter}}" class="w-fit grid justify-self-end">
+                    +</label
+                  >
+                </th>
+                <th> {{rs.RBNo}}</th>
+                <th> {{rs.MNo.MNo}}</th>
+                <th> {{rs.WCName.WCName}}</th>
+                <th> {{rs.RBDate}}</th>
+                <th> {{rs.RBPrice}}</th>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th></th>
+                <th>Restocking bill number</th>
+                <th>Manager number</th>
+                <th>Wholesale Company Name</th>
+                <th>Date</th>
+                <th>Total Price</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script src="restockingBill.js"></script>
+  </body>
+</html>

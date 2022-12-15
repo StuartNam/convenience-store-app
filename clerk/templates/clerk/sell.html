@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="clerk_style.css"> -->
+    <link rel="stylesheet" href="{% static 'clerk/style.css' %}">
+    <title>Grocery Store Management</title>
+</head>
+
+<body onload="hideSubmitForm()">
+    <div class="container">
+        <div class="left">
+            <div class="header">
+                <h4>Add membership account</h4>
+            </div>
+
+            <form action = "sell/add_new_customer" method = "post">
+                {% csrf_token %}
+                <div>
+                    <label for = "CPhoneNo"> Phone number </label>
+                    <input id = "CPhoneNo" name = "CPhoneNo" type = "text">
+                </div>
+
+                <div>
+                    <label for = "CName"> Name </label>
+                    <input id = "CName" name = "CName" type = "text">
+                </div>
+
+                <div>
+                    <label for = "CAddress"> Address </label>
+                    <input id = "CAddress" name = "CAddress" type = "text">    
+                </div>
+
+                <div class="button">
+                    <input id = "submit-info-customer" name = "submit" type = "submit" value = "OK">
+                    <input id = "reset-info-customer" name = "reset" onclick = resetCtmInfo type="button" value = "Reset">
+                </div>
+            </form>  
+        </div>
+
+        <div class="right">
+            <div class="header">
+                <h4>Selling</h4>
+            </div>
+            
+            <form id="sell-calc-bill" action = "sell/calc_bill" method = "post">
+                {% csrf_token %}
+
+                <div class="cc-info">
+                    <div class="customer-info">
+                        <label>Customer</label>
+                        <input id="bill-phone" type="tel" name = "CPhoneNo" pattern="0[3,5,7,8,9][0-9]{8}" required placeholder="(Customer phone number)" value = {{request.session.context.c_phone_no}}>
+                    </div>
+                    <div class="clerk-info">
+                        <label>Clerk Info</label>
+                        <input id="clerkID" type="text" name = "ClNo" placeholder="(Clerk ID)" value = {{request.session.context.cl_no}}>
+                    </div>
+                </div>
+    
+                <div class="bill-info">
+                    <h4>Bill Info</h4>
+                    
+                    <div class="product-attribute-name">
+                        <div class="product-info">
+                            PBarcode
+                        </div>
+                        <div class="product-info">
+                            Quantity
+                        </div>
+                        <div class="product-info">
+                            PName
+                        </div>
+                        <div class="product-info">
+                            Price
+                        </div>
+                        <div class="product-info">
+                            Final Price
+                        </div>
+                    </div>
+                    
+                    <div class="total-product">
+                        {% with i='0' %}
+                        {% for product_number, product_attribute in request.session.context.product.items %}
+                            <div id="productattribute" class="product-attribute">
+                                <div class="product-info">
+                                    <input id = "p-barcode{{forloop.counter0}}"  name = "PBarcode{{forloop.counter0}}" type="text" value = {{product_attribute.p_barcode}}>
+                                </div>
+                                <div class="product-info">
+                                    <input id="sb-qty{{forloop.counter0}}" name = "SBQty{{forloop.counter0}}" type = "number" value = {{product_attribute.sb_qty}}>
+                                </div>
+                                <div class="product-info">
+                                    <p id="p-name{{forloop.counter0}}" type="text"> {{product_attribute.p_name}} </p>
+                                </div>
+                                <div class="product-info">
+                                    <p id="p-price{{forloop.counter0}}" type="number"> {{product_attribute.p_price}}</p>
+                                </div>
+                                <div class="product-info">
+                                    <p id="sb-price{{forloop.counter0}}"> {{product_attribute.sb_price}}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% endwith %}
+                        <!-- before end -->
+                    </div>
+                </div>
+    
+                <div class="calc-price">
+                    <div>
+                        <label for="Total price">Total Price: </label>
+                        <label for="Total price" id="totalprice">{{request.session.context.total_price}}</label>
+                        <label for="Total price"> VND</label>
+                    </div>
+                    
+                    <div>
+                        <label for="Discount Rate">Discount Rate: </label>
+                        <label for="Discount Rate" id="discountrate">{{request.session.context.c_discount_rate}}</label>
+                        <label for="Discount Rate">%</label>
+                    </div>
+
+                    <div>
+                        <label for="Final Price">Final Price: </label>
+                        <label for="Final Price" id="finalprice">{{request.session.context.final_price}}</label>
+                        <label for="Final Price"> VND</label>
+                    </div>
+                </div>
+
+                <div class="button">
+                    <input class="btn" type = "button" value = "Cancel" onclick="resetbill()">
+                    <input class = "calc-bill" id = "submit" type = "submit" value = "Calculate">
+                    <input class = "calc-bill" id = "submit" type = "button" value = "Confirm Bill" onclick="loadSubmitBill()">
+                </div>
+            </form>
+
+            <div id = "add-item">
+                <div id = "add-item-header">
+                    <h4> Add product: </h4>
+                </div>
+
+                <div id = "add-item-pbarcode">
+                    <label> Barcode </label>
+                    <input id = "inp-add-pbarcode" name = "PBarcode" type = "text">
+                </div>
+
+                <div id = "add-item-sbqty">
+                    <label> Quantity </label>
+                    <input id = "inp-add-sbqty" name = "SBQty" type = "number">
+                </div>
+
+                <div id = "add-item-submit">
+                    <button id = "btn-add-item-submit"> Add </button>
+                </div>
+            </div>
+
+            <form id = "form-summit" action = "sell/submit_bill" method = "post">
+                {% csrf_token %}
+                
+                <div class="cc-info">
+                    <div class="customer-info">
+                        <label>Customer</label>
+                        <input id="bill-phone" type="tel" name = "CPhoneNo" pattern="0[3,5,7,8,9][0-9]{8}" required placeholder="(Customer phone number)" value = {{request.session.context.c_phone_no}}>
+                    </div>
+                    <div class="clerk-info">
+                        <label>Clerk Info</label>
+                        <input id="clerkID" type="text" name = "ClNo" placeholder="(Clerk ID)" value = {{request.session.context.cl_no}}>
+                    </div>
+                </div>
+
+                <div class="bill-info">
+                    <h4>Bill Info</h4>
+                    
+                    <div class="product-attribute-name">
+                        <div class="product-info">
+                            PBarcode
+                        </div>
+                        <div class="product-info">
+                            Quantity
+                        </div>
+                        <div class="product-info">
+                            PName
+                        </div>
+                        <div class="product-info">
+                            Price
+                        </div>
+                        <div class="product-info">
+                            Final Price
+                        </div>
+                    </div>
+                    
+                    <div class="total-product">
+                        {% with i='0' %}
+                        {% for product_number, product_attribute in request.session.context.product.items %}
+                            <div id="productattribute" class="product-attribute">
+                                <div class="product-info">
+                                    <input id = "p-barcode{{forloop.counter0}}"  name = "PBarcode{{forloop.counter0}}" type="text" value = {{product_attribute.p_barcode}}>
+                                </div>
+                                <div class="product-info">
+                                    <input id="sb-qty{{forloop.counter0}}" name = "SBQty{{forloop.counter0}}" type = "number" value = {{product_attribute.sb_qty}}>
+                                </div>
+                                <div class="product-info">
+                                    <p id="p-name{{forloop.counter0}}" type="text"> {{product_attribute.p_name}} </p>
+                                </div>
+                                <div class="product-info">
+                                    <p id="p-price{{forloop.counter0}}" type="number"> {{product_attribute.p_price}}</p>
+                                </div>
+                                <div class="product-info">
+                                    <p id="sb-price{{forloop.counter0}}"> {{product_attribute.sb_price}}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% endwith %}
+                        <!-- before end -->
+                    </div>
+                </div>
+    
+                <div class="calc-price">
+                    <div>
+                        <label for="Total price">Total Price: </label>
+                        <label for="Total price" id="totalprice">{{request.session.context.total_price}}</label>
+                        <label for="Total price"> VND</label>
+                    </div>
+                    
+                    <div>
+                        <label for="Discount Rate">Discount Rate: </label>
+                        <label for="Discount Rate" id="discountrate">{{request.session.context.c_discount_rate}}</label>
+                        <label for="Discount Rate">%</label>
+                    </div>
+
+                    <div>
+                        <label for="Final Price">Final Price: </label>
+                        <label for="Final Price" id="finalprice">{{request.session.context.final_price}}</label>
+                        <label for="Final Price"> VND</label>
+                    </div>
+                </div>
+    
+                <div class= "button">
+                    <button >  </button>
+                    <input class="btn" id="btn-cancel-bill" type = "button" value = "Cancel" onclick="showFillingBill()">
+                    <input id = "submit" name = "submit" type = "submit" value = "OK"> 
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var numbproduct = 0;
+        const obj = {
+            resetCustomerInfo: document.querySelector("#reset-info-customer"),
+            addProduct: document.querySelector("#btn-add-item-submit"),
+            calPrice: document.querySelector("#calculate-price-all"),
+            Cdisplay: document.querySelector(".total-product"),
+        };
+
+        function hideSubmitForm(){
+            var hidden = document.getElementById("form-summit");
+            hidden.style.display = "none";
+        }
+
+        function loadSubmitBill() {
+            var submitbill = document.getElementById("form-summit");
+            var fillingbill = document.getElementById("sell-calc-bill");
+            var additem = document.getElementById("add-item");
+
+            submitbill.style.display = "block";
+            fillingbill.style.display = "none";
+            additem.style.display = "none";
+        }
+
+        function showFillingBill(){
+            var submitbill = document.getElementById("form-summit");
+            var fillingbill = document.getElementById("sell-calc-bill");
+            var additem = document.getElementById("add-item");
+
+            submitbill.style.display = "none";
+            fillingbill.style.display = "block";
+            additem.style.display = "flex";
+
+            document.getElementById("totalprice").innerHTML = 0;
+            document.getElementById("finalprice").innerHTML = 0;
+            document.getElementById("discountrate").innerHTML = 0;
+            document.getElementById('bill-phone').value = '';
+            document.getElementById('clerkID').value = '';
+        }
+
+        function resetCtmInfo(){
+            document.getElementById('CName').value = '';
+            document.getElementById('CPhoneNo').value = '';
+            document.getElementById('CAddress').value = '';
+        }
+
+        function insertElement()
+        {
+            var pbarcode = document.getElementById('inp-add-pbarcode').value;
+            var sbqty = document.getElementById('inp-add-sbqty').value;
+
+            document.getElementById('inp-add-pbarcode').value = '';
+            document.getElementById('inp-add-sbqty').value = '';
+
+            obj.Cdisplay.insertAdjacentHTML("beforeend", 
+            `
+                <div id="productattribute" class="product-attribute">
+                    <div class="product-info">
+                        <input id="pbarcode${numbproduct}" name = "PBarcode${numbproduct}" type="text" value = ${pbarcode}>
+                    </div>
+                    <div class="product-info">
+                        <input id="quantity${numbproduct}" name = "SBQty${numbproduct}" type = "number" value = ${sbqty}>
+                    </div>
+                    <div class="product-info">
+                        <p id="pname${numbproduct}" type="text"></p>
+                    </div>
+                    <div class="product-info">
+                        <p id="price${numbproduct}" type="number" min="0" required onkeyup="calculateprice(this.value, document.getElementById('quantity').value, ${numbproduct})"></p>
+                    </div>
+                    <div class="product-info">
+                        <p id="finalprice${numbproduct}"></p>
+                    </div>
+                </div>
+            `);
+            numbproduct = numbproduct + 1;
+        }
+
+        function resetbill()
+        {
+            while(document.getElementById('productattribute') != undefined)
+            {
+                var delElement = document.getElementById('productattribute');
+                delElement.remove();
+            }
+
+            document.getElementById("totalprice").innerHTML = 0;
+            document.getElementById("finalprice").innerHTML = 0;
+            document.getElementById("discountrate").innerHTML = 0;
+            document.getElementById('bill-phone').value = '';
+            document.getElementById('clerkID').value = '';
+            numbproduct = 0;
+        }
+
+        function calculateprice(price, quantity, order)
+        {
+            document.getElementById("finalprice").innerHTML = price*quantity;
+        }
+
+        obj.addProduct.addEventListener("click", () => {
+            insertElement();
+        })
+
+        obj.resetCustomerInfo.addEventListener("click", () => {
+            resetCtmInfo();
+        })
+        
+        obj.calPrice.addEventListener("click", () => {
+            var totalPrice;
+            while(document.getElementById('finalprice') != undefined){
+                totalPrice = totalPrice + document.getElementById('finalprice').value;
+            }
+            document.getElementById('total-price').innerHTML = totalPrice;
+        })
+    </script>
+</body>
+</html>
+<!--
+<div class="product-attribute">
+    <div class="product-info">
+        <input id= "pbarcode0" name = "PBarcode0" type="text">
+    </div>
+    <div class="product-info">
+        <input id="quantity0" name = "SBQty0"type="number" min = "1" onkeyup="calculateprice(document.getElementById('price').value, this.value)">
+    </div>
+    <div class="product-info">
+        <p id="pname0" type="text"></p>
+    </div>
+    <div class="product-info">
+        <p id="price0" type="number" min="0" required onkeyup="calculateprice(this.value, document.getElementById('quantity').value)"></p>
+    </div>
+    <div class="product-info">
+        <p id="finalprice0">34</p>
+    </div>
+</div>
+-->
