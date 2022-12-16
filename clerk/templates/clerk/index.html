@@ -10,6 +10,7 @@
         <p> This is the clerk index page. This page allows log in for clerk </p>
 
         <form action = "./sell" method = "post">
+            {% csrf_token %}
             <input type = "submit" value = "Sell">
         </form>
     </body>

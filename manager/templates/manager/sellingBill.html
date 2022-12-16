@@ -42,7 +42,7 @@
               {% for detail in lst_selling_bill_detail %}
               {% if product.PBarcode == detail.PBarcode.PBarcode and sb.SBNo == detail.SBNo.SBNo %}
                 <th>{{detail.SBQty}}</th>
-                <th>{%widthratio detail.SBQty 1 product.PPrice%</th>
+                <th>{%widthratio detail.SBQty 1 product.PPrice%}</th>
               {% endif %}
               {% endfor %}
               
