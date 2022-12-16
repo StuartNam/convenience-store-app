@@ -96,7 +96,24 @@ def submit_bill(request):
         sb_price = p_price * int(request.POST['SBQty' + iterator])
         total_price += sb_price
 
-        iterator = str(int(iterator) + 1)
+        try:
+            accumulating_service = AccumulatingService.objects.get(
+                CPhoneNo = customer, 
+                PBarcode = product
+            )
+        except:
+            accumulating_service = AccumulatingService.objects.create(
+                CPhoneNo = customer, 
+                PBarcode = product,
+                ASNoStamps = int(request.POST['SBQty' + iterator]),
+                ASMinStamps = 5
+            )
+
+            accumulating_service.save()
+        else:
+            accumulating_service.ASNoStamps += int(request.POST['SBQty' + iterator])
+        finally:
+            iterator = str(int(iterator) + 1)
 
     final_price = int(total_price * (100 - c_discount_rate) // 100 // 1000 * 1000)
 
